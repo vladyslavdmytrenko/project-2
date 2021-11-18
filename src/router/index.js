@@ -1,14 +1,48 @@
-import DeletePage from 'pages/Appointment/Delete';
-import EditPage from 'pages/Appointment/Edit';
-import HomePage from 'pages/Appointment/All';
-import InfoPage from 'pages/Appointment/Detail';
+import React from 'react';
+import { Navigate, Route, Routes } from 'react-router-dom';
 
-export const PrivateRoutes = [
-  { path: '/appointments/:id', Component: <InfoPage />, exact: true },
-  { path: '/appointments/:id/delete', Component: <DeletePage />, exact: true },
-  { path: '/appointments/:id/edit', Component: <EditPage />, exact: true },
-];
+import PrivateRoutes from 'components/PrivateRoute';
 
-export const PublicRoutes = [
-  { path: '/', Component: <HomePage />, exact: true },
-];
+import All from 'pages/Appointment/All';
+import Delete from 'pages/Appointment/Delete';
+import Detail from 'pages/Appointment/Detail';
+import Edit from 'pages/Appointment/Edit';
+
+const Router = () => {
+  return (
+    <Routes>
+      <Route path="/" element={<All />} />
+
+      <Route
+        path="/appointment/:id"
+        element={
+          <PrivateRoutes>
+            <Detail />
+          </PrivateRoutes>
+        }
+      />
+
+      <Route
+        path="/appointment/:id/delete"
+        element={
+          <PrivateRoutes>
+            <Delete />
+          </PrivateRoutes>
+        }
+      />
+
+      <Route
+        path="/appointment/:id/edit"
+        element={
+          <PrivateRoutes>
+            <Edit />
+          </PrivateRoutes>
+        }
+      />
+
+      <Route path="*" element={<Navigate to="/" />} />
+    </Routes>
+  );
+};
+
+export default Router;
