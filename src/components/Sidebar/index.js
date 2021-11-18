@@ -4,7 +4,7 @@ import { LoginOutlined, LogoutOutlined } from '@ant-design/icons';
 import { useSelector, useDispatch } from 'react-redux';
 
 import { login, logout } from 'redux/reducers/authSlice';
-import { FETCH_STATUS } from 'constant/fetchStatus';
+import { FETCH_STATUS } from 'constant';
 
 import style from './Sidebar.module.css';
 

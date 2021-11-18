@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
-import { FETCH_STATUS } from 'constant/fetchStatus';
+import { FETCH_STATUS } from 'constant';
 import { googleLogin, googleLogout } from 'api/googleAuth';
 
 const initialState = {
@@ -37,7 +37,7 @@ const auth = createSlice({
       })
       .addCase(login.rejected, (state, action) => {
         state.status = FETCH_STATUS.FAILED;
-        state.error = action.payload;
+        state.error = action.error.message;
       })
 
       .addCase(logout.pending, (state) => {
@@ -52,7 +52,7 @@ const auth = createSlice({
       })
       .addCase(logout.rejected, (state, action) => {
         state.status = FETCH_STATUS.FAILED;
-        state.error = action.payload;
+        state.error = action.error.message;
       });
   },
 });
