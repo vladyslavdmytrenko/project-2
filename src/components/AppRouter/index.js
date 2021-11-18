@@ -1,23 +1,52 @@
 import React from 'react';
-import { Route, Routes } from 'react-router';
+import { Navigate, Route, Routes } from 'react-router-dom';
 import { Layout } from 'antd';
 
+import PrivateRoutes from 'components/PrivateRoute';
 import Sidebar from 'components/Sidebar';
 
-import { PublicRoutes, PrivateRoutes } from 'router';
+import All from 'pages/Appointment/All';
+import Delete from 'pages/Appointment/Delete';
+import Detail from 'pages/Appointment/Detail';
+import Edit from 'pages/Appointment/Edit';
 
 const AppRouter = () => {
-  const renderRoute = (routes) =>
-    routes.map(({ path, Component, exact }, idx) => (
-      <Route key={idx} path={path} element={Component} exact={exact} />
-    ));
-
   return (
     <Layout>
       <Sidebar />
+
       <Layout>
         <Routes>
-          {renderRoute(PublicRoutes)} {renderRoute(PrivateRoutes)}
+          <Route path="/" element={<All />} />
+
+          <Route
+            path="/appointment/:id"
+            element={
+              <PrivateRoutes>
+                <Detail />
+              </PrivateRoutes>
+            }
+          />
+
+          <Route
+            path="/appointment/:id/delete"
+            element={
+              <PrivateRoutes>
+                <Delete />
+              </PrivateRoutes>
+            }
+          />
+
+          <Route
+            path="/appointment/:id/edit"
+            element={
+              <PrivateRoutes>
+                <Edit />
+              </PrivateRoutes>
+            }
+          />
+
+          <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </Layout>
     </Layout>

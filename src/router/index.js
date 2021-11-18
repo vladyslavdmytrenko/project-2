@@ -1,7 +1,7 @@
 import DeletePage from 'pages/Appointment/Delete';
 import EditPage from 'pages/Appointment/Edit';
-import HomePage from 'pages/Appointment/Home';
-import InfoPage from 'pages/Appointment/Info';
+import HomePage from 'pages/Appointment/All';
+import InfoPage from 'pages/Appointment/Detail';
 
 export const PrivateRoutes = [
   { path: '/appointments/:id', Component: <InfoPage />, exact: true },

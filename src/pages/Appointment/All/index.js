@@ -1,12 +1,12 @@
 import React from 'react';
 
 import AppointmentTable from 'components/Appointment/Table';
-import AppointmentForm from 'components/Appointment/TableForm';
+import AppointmentsFilter from 'components/Appointment/AppointmentsFilter';
 
 const HomePage = () => {
   return (
     <>
-      <AppointmentForm />
+      <AppointmentsFilter />
       <AppointmentTable />
     </>
   );

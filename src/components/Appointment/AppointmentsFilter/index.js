@@ -3,7 +3,7 @@ import { Col, Layout, Row, Select } from 'antd';
 
 // import style from './index.module.css';
 
-const AppointmentForm = () => {
+const AppointmentsFilter = () => {
   return (
     <Layout.Header>
       <Row justify="space-between" gutter={10}>
@@ -32,4 +32,4 @@ const AppointmentForm = () => {
   );
 };
 
-export default AppointmentForm;
+export default AppointmentsFilter;

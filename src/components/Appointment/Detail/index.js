@@ -11,6 +11,7 @@ const AppointmentDetail = () => {
           <Typography.Title level={1}>Appointment #id Details</Typography.Title>
         </Col>
       </Row>
+
       <Row justify="space-around" className={style.container}>
         <Col span={10}>
           <Card title="General Information" className={style.card}>
@@ -26,6 +27,7 @@ const AppointmentDetail = () => {
             </Row>
           </Card>
         </Col>
+
         <Col span={10}>
           <Card title="Contact Information" className={style.card}>
             Contact Information
