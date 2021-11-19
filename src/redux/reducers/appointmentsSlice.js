@@ -7,6 +7,11 @@ const initialState = {
   status: FETCH_STATUS.IDLE,
   error: null,
   appointments: [],
+  filteredAppointments: null,
+  filterCriteria: {
+    appointmentStatus: 'All',
+    department: 'All',
+  },
   appointmentStatus: [
     'All',
     'Pending',
@@ -43,13 +48,39 @@ export const deleteAppointments = createAsyncThunk(
 
 export const fetchDepartments = createAsyncThunk(
   'appointments/fetchDepartments',
-  async () => {}
+  async () => {
+    const departments = api.get('/departments');
+    return departments;
+  }
 );
 
 const appointmentsSlice = createSlice({
   name: 'appointments',
   initialState,
-  reducers: {},
+  reducers: {
+    filterAppointment: (state, action) => {
+      let filteredAppointments = JSON.parse(JSON.stringify(state.appointments));
+      state.filterCriteria = action.payload;
+
+      if (action.payload.appointmentStatus !== 'All') {
+        filteredAppointments = filteredAppointments.filter(
+          (item) => item.status === action.payload.appointmentStatus
+        );
+      }
+
+      if (action.payload.department !== 'All') {
+        filteredAppointments = filteredAppointments.filter(
+          (item) => item.department === action.payload.department
+        );
+      }
+
+      state.filteredAppointments = filteredAppointments;
+    },
+
+    updateDepartment: (state, action) => {
+      state.departments = action.payload;
+    },
+  },
   extraReducers(builder) {
     builder
       .addCase(fetchAppointments.pending, (state) => {
@@ -62,8 +93,24 @@ const appointmentsSlice = createSlice({
       .addCase(fetchAppointments.rejected, (state, action) => {
         state.status = FETCH_STATUS.FAILED;
         state.error = action.error.message;
+      })
+
+      .addCase(fetchDepartments.fulfilled, (state, action) => {
+        const existDepartments = JSON.parse(JSON.stringify(state.departments));
+        state.departments = [...existDepartments, ...action.payload];
       });
   },
 });
 
+export const { filterAppointment, updateDepartment } =
+  appointmentsSlice.actions;
+
 export default appointmentsSlice.reducer;
+
+export const selectFilteredAppointments = (state) => {
+  if (state.appointments.filteredAppointments) {
+    return state.appointments.filteredAppointments;
+  }
+
+  return state.appointments.appointments;
+};

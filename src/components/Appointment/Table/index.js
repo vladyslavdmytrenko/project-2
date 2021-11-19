@@ -4,7 +4,10 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router';
 
 import { FETCH_STATUS } from 'constant';
-import { fetchAppointments } from 'redux/reducers/appointmentsSlice';
+import {
+  fetchAppointments,
+  selectFilteredAppointments,
+} from 'redux/reducers/appointmentsSlice';
 import { timestampToDate } from 'utils';
 
 import style from './Table.module.css';
@@ -34,9 +37,8 @@ const columns = [
 ];
 
 const AppointmentTable = () => {
-  const { appointments, status, error } = useSelector(
-    (state) => state.appointments
-  );
+  const appointments = useSelector(selectFilteredAppointments);
+  const { status, error } = useSelector((state) => state.appointments);
   const dispatch = useDispatch();
   const getAppointment = () => dispatch(fetchAppointments());
   const navigate = useNavigate();
