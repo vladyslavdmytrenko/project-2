@@ -23,6 +23,8 @@ const columns = [
     dataIndex: 'appointment_date',
     key: 'appointment_date',
     render: (timestamp) => timestampToDate(timestamp),
+    defaultSortOrder: 'descend',
+    sorter: (a, b) => a.appointment_date - b.appointment_date,
   },
   {
     title: 'Department',
