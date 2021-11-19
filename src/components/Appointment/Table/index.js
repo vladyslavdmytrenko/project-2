@@ -84,6 +84,7 @@ const AppointmentTable = () => {
       dataSource={appointments}
       onRow={handlerRow}
       loading={status === FETCH_STATUS.LOADING}
+      pagination={{ showSizeChanger: false }}
     />
   );
 };
