@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Col, Layout, Row, Select, Spin } from 'antd';
+import { Col, Select, Spin } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 
 import {
@@ -68,29 +68,26 @@ const AppointmentsFilter = () => {
   };
 
   return (
-    <Layout.Header>
-      <Row justify="space-between" gutter={10}>
-        <Col span={6}></Col>
-        <Col offset={6} span={6}>
-          <Select
-            style={{ width: '100%', marginRight: '5px' }}
-            placeholder="Select department"
-            onChange={onDepartmentChange}
-          >
-            {renderDepartments()}
-          </Select>
-        </Col>
-        <Col span={6}>
-          <Select
-            style={{ width: '100%' }}
-            placeholder="Select Status"
-            onChange={onStatusChange}
-          >
-            {renderStatus}
-          </Select>
-        </Col>
-      </Row>
-    </Layout.Header>
+    <>
+      <Col span={11}>
+        <Select
+          style={{ width: '100%', marginRight: '5px' }}
+          placeholder="Select department"
+          onChange={onDepartmentChange}
+        >
+          {renderDepartments()}
+        </Select>
+      </Col>
+      <Col offset={2} span={11}>
+        <Select
+          style={{ width: '100%' }}
+          placeholder="Select Status"
+          onChange={onStatusChange}
+        >
+          {renderStatus}
+        </Select>
+      </Col>
+    </>
   );
 };
 
