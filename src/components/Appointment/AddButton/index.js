@@ -34,10 +34,9 @@ const AddButton = () => {
       <Modal
         title="Create an Appointment"
         visible={isModalVisible}
-        onOk={handleOk}
         onCancel={handleCancel}
         width="80%"
-        okText="Create"
+        footer={null}
       >
         <AppointmentForm />
       </Modal>
