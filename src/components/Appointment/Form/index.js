@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Col,
   Row,
@@ -10,71 +10,45 @@ import {
   Button,
 } from 'antd';
 import { useFormik } from 'formik';
-import * as yup from 'yup';
-import moment from 'moment';
 import NumberFormat from 'react-number-format';
+import { useSelector, useDispatch } from 'react-redux';
+
+import { validationSchema } from '../validationForm';
+import {
+  DATE_FORMAT,
+  TIME_FORMAT,
+  INITIAL_FORM_VALUES,
+  FETCH_STATUS,
+} from 'constant';
 
 import style from './AppointmentForm.module.css';
+import { fetchDepartments } from 'redux/reducers/appointmentsSlice';
 
-const formatTime = 'HH:mm';
-const formatDate = 'MM/DD/YYYY';
+const renderOptionDepartments = (departments) => {
+  if (!departments) return null;
 
-const validationSchema = yup.object({
-  firstName: yup
-    .string()
-    .max(100, 'Maximum is 100 characters')
-    .required('Required'),
-
-  secondName: yup
-    .string()
-    .max(100, 'Maximum is 100 characters')
-    .required('Required'),
-
-  appointmentDate: yup
-    .string()
-    .nullable()
-    .required('Required')
-    .test(
-      'dateTest',
-      'Invalid date',
-      (value) =>
-        moment(value).format(formatDate) > moment(Date.now()).format(formatDate)
-    ),
-
-  appointmentTime: yup
-    .string()
-    .nullable()
-    .required('Required')
-    .test(
-      'timeTest',
-      'Invalid date',
-      (value) =>
-        moment(value).format(formatTime) > moment(Date.now()).format(formatTime)
-    ),
-
-  phoneNumber: yup
-    .string()
-    .matches(/\(\d{3}\)-\d{3}-\d{4}/g, 'Phone number is not valid')
-    .required('Required'),
-
-  notes: yup.string().max(500),
-});
+  return departments.map((item) => (
+    <Select.Option key={item} value={item}>
+      {item}
+    </Select.Option>
+  ));
+};
 
 const AppointmentForm = (props) => {
-  const initialValues = {
-    firstName: '',
-    secondName: '',
-    appointmentDate: '',
-    appointmentTime: '',
-    phoneNumber: '',
-    notes: '',
-    department: null,
-  };
+  const {
+    onSubmitAction,
+    onCancelAction,
+    formValues,
+    submitTitle,
+    cancelTitle,
+  } = props;
+
+  const initialValues = formValues || INITIAL_FORM_VALUES;
 
   const {
+    handleSubmit,
     handleChange,
     handleBlur,
-    handleSubmit,
     resetForm,
     setFieldValue,
     setFieldTouched,
@@ -86,15 +60,45 @@ const AppointmentForm = (props) => {
     isInitialValid: false,
     initialValues,
     validationSchema,
-    onSubmit: (values) => console.log(values),
+    onSubmit: (values) => {
+      console.log(values);
+      onSubmitAction && onSubmitAction(values);
+      resetForm();
+    },
   });
+
+  const dispatch = useDispatch();
+  const departments = useSelector((state) =>
+    state.appointments.departments.filter((item) => item !== 'All')
+  );
+  const [departmentStatus, setDepartmentStatus] = useState(FETCH_STATUS.IDLE);
+
+  useEffect(() => {
+    const getDepartments = async () => {
+      setDepartmentStatus(FETCH_STATUS.LOADING);
+      try {
+        await dispatch(fetchDepartments());
+        setDepartmentStatus(FETCH_STATUS.SUCCEEDED);
+      } catch (e) {
+        setDepartmentStatus(FETCH_STATUS.FAILED);
+      }
+    };
+
+    if (departmentStatus !== FETCH_STATUS.LOADING && !departments.length) {
+      getDepartments();
+    }
+  });
+
+  const handleCancel = () => {
+    resetForm();
+    onCancelAction && onCancelAction();
+  };
 
   return (
     <Form layout="vertical" autoComplete="off" onFinish={handleSubmit}>
       <Row justify="space-around">
         <Col span={10}>
           <Form.Item
-            name="firstName"
             label="First Name"
             hasFeedback={touched.firstName}
             help={
@@ -133,7 +137,7 @@ const AppointmentForm = (props) => {
               <DatePicker
                 className={style.input}
                 allowClear={false}
-                format={formatDate}
+                format={DATE_FORMAT}
                 onChange={(date) => {
                   setFieldValue('appointmentDate', date);
                 }}
@@ -159,7 +163,8 @@ const AppointmentForm = (props) => {
               <TimePicker
                 className={style.input}
                 allowClear={false}
-                format={formatTime}
+                format={TIME_FORMAT}
+                minuteStep={60}
                 onChange={(time) => {
                   setFieldValue('appointmentTime', time);
                 }}
@@ -169,11 +174,30 @@ const AppointmentForm = (props) => {
             </Form.Item>
           </Row>
 
-          <Form.Item label="Department" required>
-            <Select placeholder="Select Department">
-              <Select.Option value="jack">Jack</Select.Option>
-              <Select.Option value="lucy">Lucy</Select.Option>
-              <Select.Option value="tom">Tom</Select.Option>
+          <Form.Item
+            label="Department"
+            hasFeedback={touched.department}
+            help={
+              touched.department && errors.department
+                ? errors.department
+                : false
+            }
+            validateStatus={
+              touched.department && errors.department ? 'error' : 'success'
+            }
+            required
+          >
+            <Select
+              name="department"
+              placeholder="Select Department"
+              onChange={(value) => {
+                setFieldValue('department', value);
+              }}
+              onBlur={() => setFieldTouched('department')}
+              loading={departmentStatus === FETCH_STATUS.LOADING}
+              value={values.department}
+            >
+              {renderOptionDepartments(departments)}
             </Select>
           </Form.Item>
         </Col>
@@ -193,11 +217,12 @@ const AppointmentForm = (props) => {
             required
           >
             <Input
-              placeholder="Enter second name"
               name="secondName"
+              type="text"
+              placeholder="Enter second name"
               onChange={handleChange}
               onBlur={handleBlur}
-              valuer={values.secondName}
+              value={values.secondName}
             />
           </Form.Item>
 
@@ -230,7 +255,6 @@ const AppointmentForm = (props) => {
           </Form.Item>
 
           <Form.Item
-            name="notes"
             label="Notes"
             hasFeedback={touched.notes}
             help={touched.notes && errors.notes ? errors.notes : false}
@@ -246,14 +270,11 @@ const AppointmentForm = (props) => {
           </Form.Item>
 
           <Form.Item>
-            <Button type="primary" htmlType="submit" disabled={!isValid}>
-              Submit
+            <Button htmlType="button" onClick={handleCancel}>
+              {cancelTitle}
             </Button>
-            <Button
-              htmlType="button"
-              onClick={() => resetForm({ values: initialValues })}
-            >
-              Cancel
+            <Button type="primary" htmlType="submit" disabled={!isValid}>
+              {submitTitle}
             </Button>
           </Form.Item>
         </Col>
