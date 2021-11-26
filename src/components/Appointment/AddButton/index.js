@@ -2,12 +2,15 @@ import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Button, Modal } from 'antd';
 import { PlusCircleOutlined } from '@ant-design/icons';
+import { useDispatch } from 'react-redux';
 
 import AppointmentForm from 'components/Appointment/Form';
+import { createAppointment } from 'redux/reducers/appointmentsSlice';
 
 const AddButton = () => {
   const isAuth = useSelector((state) => state.auth.isAuth);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const dispatch = useDispatch();
 
   if (!isAuth) return null;
 
@@ -15,7 +18,8 @@ const AddButton = () => {
     setIsModalVisible(true);
   };
 
-  const handleOk = () => {
+  const handleOk = async (newAppointment) => {
+    await dispatch(createAppointment(newAppointment));
     setIsModalVisible(false);
   };
 
@@ -34,11 +38,15 @@ const AddButton = () => {
       <Modal
         title="Create an Appointment"
         visible={isModalVisible}
-        onCancel={handleCancel}
         width="80%"
         footer={null}
       >
-        <AppointmentForm />
+        <AppointmentForm
+          onCancelAction={handleCancel}
+          onSubmitAction={handleOk}
+          submitTitle="Create"
+          cancelTitle="Cancel"
+        />
       </Modal>
     </>
   );
