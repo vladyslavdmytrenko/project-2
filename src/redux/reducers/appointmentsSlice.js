@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
 import { FETCH_STATUS } from 'constant';
 import api from 'api/appointment';
+import { dateTimeToTimestamp } from 'utils';
 
 const initialState = {
   status: FETCH_STATUS.IDLE,
@@ -31,19 +32,46 @@ export const fetchAppointments = createAsyncThunk(
   }
 );
 
-export const createAppointments = createAsyncThunk(
+export const fetchAppointment = createAsyncThunk(
+  'appointments/fetchAppointment',
+  async (id) => {
+    const appointments = await api.get(`/appointments/${id}`);
+    return appointments;
+  }
+);
+
+export const createAppointment = createAsyncThunk(
   'appointments/createAppointment',
-  async (appointments) => {}
+  async (appointments) => {
+    const timestamp = dateTimeToTimestamp(
+      appointments.appointmentDate,
+      appointments.appointmentTime
+    );
+    const transformData = {
+      patient_name: `${appointments.firstName} ${appointments.secondName}`,
+      appointment_date: timestamp,
+      department: appointments.department,
+      status: 'Pending',
+      phone_number: appointments.phoneNumber,
+      notes: appointments.notes,
+    };
+
+    const result = api.post('/appointments', transformData);
+    return result;
+  }
 );
 
-export const updateAppointments = createAsyncThunk(
+export const updateAppointment = createAsyncThunk(
   'appointments/updateAppointment',
-  async (appointmentId) => {}
+  async (id, data) => {
+    const result = await api.patch(`/appointments/${id}`, data);
+    return result;
+  }
 );
 
-export const deleteAppointments = createAsyncThunk(
+export const deleteAppointment = createAsyncThunk(
   'appointments/deleteAppointment',
-  async (appointmentId) => {}
+  async (appointmentId, appointment) => {}
 );
 
 export const fetchDepartments = createAsyncThunk(
@@ -95,9 +123,12 @@ const appointmentsSlice = createSlice({
         state.error = action.error.message;
       })
 
+      .addCase(createAppointment.fulfilled, (state, action) => {
+        state.appointments.push(action.payload);
+      })
+
       .addCase(fetchDepartments.fulfilled, (state, action) => {
-        const existDepartments = JSON.parse(JSON.stringify(state.departments));
-        state.departments = [...existDepartments, ...action.payload];
+        state.departments = ['All', ...action.payload];
       });
   },
 });
