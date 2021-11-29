@@ -14,12 +14,10 @@ const Sidebar = () => {
 
   const onClickMenuItem = ({ key }) => {
     if (key === 'login') {
-      console.log('login');
       dispatch(login());
     }
 
     if (key === 'logout') {
-      console.log('logout');
       dispatch(logout());
     }
   };
