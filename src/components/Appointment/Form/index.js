@@ -75,8 +75,9 @@ const AppointmentForm = (props) => {
   useEffect(() => {
     const getDepartments = async () => {
       setDepartmentStatus(FETCH_STATUS.LOADING);
+
       try {
-        await dispatch(fetchDepartments());
+        await dispatch(fetchDepartments()).unwrap();
         setDepartmentStatus(FETCH_STATUS.SUCCEEDED);
       } catch (e) {
         setDepartmentStatus(FETCH_STATUS.FAILED);
