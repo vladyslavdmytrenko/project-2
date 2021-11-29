@@ -4,10 +4,17 @@ import { Select, Col, Row, Space, Button } from 'antd';
 // import style from './Detail.module.css';
 
 const AppointmentDetailForm = (props) => {
-  const { statuses, handleChangeOption, value } = props;
+  const {
+    statuses,
+    value,
+    handleChangeOption,
+    handleNavigateToEdit,
+    handleNavigateToDelete,
+  } = props;
+
   const renderOptions = () =>
     statuses.map((status) => (
-      <Select.Option key={value} value={status}>
+      <Select.Option key={status} value={status}>
         {status}
       </Select.Option>
     ));
@@ -22,14 +29,18 @@ const AppointmentDetailForm = (props) => {
               placeholder="Select department"
               size="large"
               onChange={handleChangeOption}
-              defaultValue={statuses.find((item) => item === value)}
+              defaultValue={value}
             >
               {renderOptions()}
             </Select>
-            <Button type="primary" size="large">
+            <Button type="primary" size="large" onClick={handleNavigateToEdit}>
               Edit
             </Button>
-            <Button type="primary" size="large">
+            <Button
+              type="primary"
+              size="large"
+              onClick={handleNavigateToDelete}
+            >
               Delete
             </Button>
           </Space>
