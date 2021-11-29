@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Table, Result, Button } from 'antd';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router';
@@ -8,7 +8,7 @@ import {
   fetchAppointments,
   selectFilteredAppointments,
 } from 'redux/reducers/appointmentsSlice';
-import { timestampToDate } from 'utils';
+import { timestampToDateTime } from 'utils';
 
 import style from './Table.module.css';
 
@@ -22,7 +22,7 @@ const columns = [
     title: 'Appointment date',
     dataIndex: 'appointment_date',
     key: 'appointment_date',
-    render: (timestamp) => timestampToDate(timestamp),
+    render: (timestamp) => timestampToDateTime(timestamp),
     defaultSortOrder: 'descend',
     sorter: (a, b) => a.appointment_date - b.appointment_date,
   },
@@ -40,16 +40,27 @@ const columns = [
 
 const AppointmentTable = () => {
   const appointments = useSelector(selectFilteredAppointments);
-  const { status, error } = useSelector((state) => state.appointments);
+  const [status, setStatus] = useState(FETCH_STATUS.IDLE);
+  const [error, setError] = useState(null);
   const dispatch = useDispatch();
-  const getAppointment = () => dispatch(fetchAppointments());
   const navigate = useNavigate();
 
   useEffect(() => {
     if (status === FETCH_STATUS.IDLE) {
-      getAppointment();
+      getAppointments();
     }
   });
+
+  const getAppointments = async () => {
+    setStatus(FETCH_STATUS.LOADING);
+    try {
+      await dispatch(fetchAppointments()).unwrap();
+      setStatus(FETCH_STATUS.SUCCEEDED);
+    } catch (e) {
+      setError(e.message);
+      setStatus(FETCH_STATUS.FAILED);
+    }
+  };
 
   const handlerRow = (record) => {
     return {
@@ -60,7 +71,7 @@ const AppointmentTable = () => {
   };
 
   const onReFetchAppointment = () => {
-    getAppointment();
+    getAppointments();
   };
 
   if (status === FETCH_STATUS.FAILED) {
@@ -83,7 +94,8 @@ const AppointmentTable = () => {
       columns={columns}
       dataSource={appointments}
       onRow={handlerRow}
-      loading={status === FETCH_STATUS.LOADING}
+      rowKey={(record) => record.id}
+      loading={status === !FETCH_STATUS.SUCCEEDED}
       pagination={{ showSizeChanger: false }}
     />
   );
