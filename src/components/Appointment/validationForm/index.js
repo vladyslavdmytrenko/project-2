@@ -33,7 +33,7 @@ export const validationSchema = yup.object({
     .matches(/\(\d{3}\)-\d{3}-\d{4}/g, 'Phone number is not valid')
     .required('Required'),
 
-  notes: yup.string().max(500),
+  notes: yup.string().max(1000, 'Maximum is 1000 characters'),
 
   department: yup.string().ensure().required('Department required'),
 });
