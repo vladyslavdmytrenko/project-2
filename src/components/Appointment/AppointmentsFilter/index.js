@@ -19,9 +19,10 @@ const AppointmentsFilter = () => {
 
   useEffect(() => {
     const fetchDepartment = async () => {
+      setDepartmentStatus(FETCH_STATUS.LOADING);
+
       try {
-        setDepartmentStatus(FETCH_STATUS.LOADING);
-        dispatch(fetchDepartments()).unwrap();
+        await dispatch(fetchDepartments()).unwrap();
         setDepartmentStatus(FETCH_STATUS.SUCCEEDED);
       } catch (e) {
         setDepartmentStatus(FETCH_STATUS.FAILED);
