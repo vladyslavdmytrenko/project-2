@@ -57,11 +57,10 @@ const AppointmentForm = (props) => {
     errors,
     isValid,
   } = useFormik({
-    isInitialValid: false,
+    validateOnMount: true,
     initialValues,
     validationSchema,
     onSubmit: (values) => {
-      console.log(values);
       onSubmitAction && onSubmitAction(values);
       resetForm();
     },
