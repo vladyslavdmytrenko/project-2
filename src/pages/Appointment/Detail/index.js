@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Row, Col, Typography, Spin, Result, Button } from 'antd';
-import { useParams } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
+import { useParams } from 'react-router';
+import { useNavigate } from 'react-router-dom';
+import { Row, Col, Typography, Spin, Result, Button } from 'antd';
 
 import AppointmentDetailForm from 'components/Appointment/DetailForm';
 import AppointmentDetail from 'components/Appointment/Detail';
@@ -13,47 +14,60 @@ import {
 
 const DetailPage = () => {
   const { id } = useParams();
+
+  const navigate = useNavigate();
   const dispatch = useDispatch();
+
   const [appointment, setAppointment] = useState(null);
   const [appointmentStatus, setAppointmentStatus] = useState(FETCH_STATUS.IDLE);
   const [fetchError, setFetchError] = useState(null);
-  console.log(appointment);
+
   const isAuth = useSelector((state) => state.auth.isAuth);
   const statuses = useSelector((state) =>
     state.appointments.appointmentStatus.filter((item) => item !== 'All')
   );
-
-  const handleChangeOption = async (value) => {
-    setAppointmentStatus(FETCH_STATUS.LOADING);
-    try {
-      await dispatch(updateAppointment(id, { status: value })).unwrap();
-      setAppointmentStatus(FETCH_STATUS.SUCCEEDED);
-    } catch (e) {
-      setFetchError(e.message);
-      setAppointmentStatus(FETCH_STATUS.FAILED);
-    }
-  };
-
-  const getAppointment = async () => {
-    setAppointmentStatus(FETCH_STATUS.LOADING);
-    try {
-      const result = await dispatch(fetchAppointment(id)).unwrap();
-      console.log(result);
-      setAppointment(result);
-
-      setAppointmentStatus(FETCH_STATUS.SUCCEEDED);
-    } catch (e) {
-      console.log(e);
-      setFetchError(e.message);
-      setAppointmentStatus(FETCH_STATUS.FAILED);
-    }
-  };
 
   useEffect(() => {
     if (appointmentStatus === FETCH_STATUS.IDLE) {
       getAppointment(id);
     }
   });
+
+  const getAppointment = async (id) => {
+    setAppointmentStatus(FETCH_STATUS.LOADING);
+    try {
+      const result = await dispatch(fetchAppointment(id)).unwrap();
+
+      setAppointment(result);
+      setAppointmentStatus(FETCH_STATUS.SUCCEEDED);
+    } catch (e) {
+      setFetchError(e.message);
+      setAppointmentStatus(FETCH_STATUS.FAILED);
+    }
+  };
+
+  const handleChangeOption = async (value) => {
+    setAppointmentStatus(FETCH_STATUS.LOADING);
+    try {
+      const result = await dispatch(
+        updateAppointment({ id, changedData: { status: value } })
+      ).unwrap();
+
+      setAppointment(result);
+      setAppointmentStatus(FETCH_STATUS.SUCCEEDED);
+    } catch (e) {
+      setFetchError(e.message);
+      setAppointmentStatus(FETCH_STATUS.FAILED);
+    }
+  };
+
+  const handleNavigateToEdit = () => {
+    navigate(`/appointment/${id}/edit`);
+  };
+
+  const handleNavigateToDelete = () => {
+    navigate(`/appointment/${id}/delete`);
+  };
 
   if (appointmentStatus === FETCH_STATUS.LOADING) {
     return (
@@ -91,8 +105,10 @@ const DetailPage = () => {
     return (
       <AppointmentDetailForm
         statuses={statuses}
-        handleChangeOption={handleChangeOption}
         value={appointment.status}
+        handleChangeOption={handleChangeOption}
+        handleNavigateToEdit={handleNavigateToEdit}
+        handleNavigateToDelete={handleNavigateToDelete}
       />
     );
   };
@@ -100,6 +116,7 @@ const DetailPage = () => {
   return (
     <>
       {renderHeader()}
+
       <Row>
         <Col offset={1}>
           <Typography.Title level={2}>
@@ -107,6 +124,7 @@ const DetailPage = () => {
           </Typography.Title>
         </Col>
       </Row>
+
       <AppointmentDetail appointment={appointment} />
     </>
   );
