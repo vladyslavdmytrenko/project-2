@@ -2,17 +2,11 @@ import { Card, Col, Row, Typography } from 'antd';
 import React from 'react';
 
 import style from './Detail.module.css';
-import { timestampToDate } from 'utils';
+import { timestampToDateTime } from 'utils';
 
 const AppointmentDetail = (props) => {
-  const {
-    appointment_date,
-    department,
-    notes,
-    patient_name,
-    phone_number,
-    status,
-  } = props.appointment;
+  const { appointment_date, department, notes, patient_name, phone_number } =
+    props.appointment;
 
   return (
     <>
@@ -25,7 +19,7 @@ const AppointmentDetail = (props) => {
               </Col>
               <Col span={12}>
                 <Typography.Title level={4}>
-                  {timestampToDate(appointment_date)}
+                  {timestampToDateTime(appointment_date)}
                 </Typography.Title>
               </Col>
             </Row>
