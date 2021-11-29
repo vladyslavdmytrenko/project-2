@@ -1,18 +1,30 @@
-import React from 'react';
-import { Table } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Table, Result, Button } from 'antd';
+import { useSelector, useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router';
 
-// import style from '';
+import { FETCH_STATUS } from 'constant';
+import {
+  fetchAppointments,
+  selectFilteredAppointments,
+} from 'redux/reducers/appointmentsSlice';
+import { timestampToDateTime } from 'utils';
+
+import style from './Table.module.css';
 
 const columns = [
   {
     title: 'Patient Name',
-    dataIndex: 'patientName',
-    key: 'patientName',
+    dataIndex: 'patient_name',
+    key: 'patient_name',
   },
   {
     title: 'Appointment date',
-    dataIndex: 'appointmentDate',
-    key: 'appointmentDate',
+    dataIndex: 'appointment_date',
+    key: 'appointment_date',
+    render: (timestamp) => timestampToDateTime(timestamp),
+    defaultSortOrder: 'descend',
+    sorter: (a, b) => a.appointment_date - b.appointment_date,
   },
   {
     title: 'Department',
@@ -26,59 +38,65 @@ const columns = [
   },
 ];
 
-const dataSource = [
-  {
-    key: 1,
-    patientName: 'Keisha Avalos',
-    appointmentDate: '12/21/2021 03:00 PM',
-    department: 'Cardiology',
-    status: 'Active',
-  },
-  {
-    key: 2,
-    patientName: 'Keisha Avalos',
-    appointmentDate: '12/21/2021 03:00 PM',
-    department: 'Cardiology',
-    status: 'Active',
-  },
-  {
-    key: 3,
-    patientName: 'Keisha Avalos',
-    appointmentDate: '12/21/2021 03:00 PM',
-    department: 'Cardiology',
-    status: 'Active',
-  },
-  {
-    key: 4,
-    patientName: 'Keisha Avalos',
-    appointmentDate: '12/21/2021 03:00 PM',
-    department: 'Cardiology',
-    status: 'Active',
-  },
-  {
-    key: 5,
-    patientName: 'Keisha Avalos',
-    appointmentDate: '12/21/2021 03:00 PM',
-    department: 'Cardiology',
-    status: 'Active',
-  },
-];
-
 const AppointmentTable = () => {
-  const handlerRow = (record, index) => {
+  const appointments = useSelector(selectFilteredAppointments);
+  const [status, setStatus] = useState(FETCH_STATUS.IDLE);
+  const [error, setError] = useState(null);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (status === FETCH_STATUS.IDLE) {
+      getAppointments();
+    }
+  });
+
+  const getAppointments = async () => {
+    setStatus(FETCH_STATUS.LOADING);
+    try {
+      await dispatch(fetchAppointments()).unwrap();
+      setStatus(FETCH_STATUS.SUCCEEDED);
+    } catch (e) {
+      setError(e.message);
+      setStatus(FETCH_STATUS.FAILED);
+    }
+  };
+
+  const handlerRow = (record) => {
     return {
-      onClick: (e) => {
-        console.log(record, index);
+      onClick: () => {
+        navigate(`appointment/${record.id}`);
       },
     };
   };
 
+  const onReFetchAppointment = () => {
+    getAppointments();
+  };
+
+  if (status === FETCH_STATUS.FAILED) {
+    return (
+      <Result
+        status="warning"
+        title={error}
+        extra={
+          <Button type="primary" key="console" onClick={onReFetchAppointment}>
+            Try again
+          </Button>
+        }
+      />
+    );
+  }
+
   return (
     <Table
-      style={{ padding: '15px' }}
+      className={style.table}
       columns={columns}
-      dataSource={dataSource}
+      dataSource={appointments}
       onRow={handlerRow}
+      rowKey={(record) => record.id}
+      loading={status === !FETCH_STATUS.SUCCEEDED}
+      pagination={{ showSizeChanger: false }}
     />
   );
 };
