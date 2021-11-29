@@ -1,12 +1,9 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
-import { FETCH_STATUS } from 'constant';
 import api from 'api/appointment';
 import { dateTimeToTimestamp } from 'utils';
 
 const initialState = {
-  status: FETCH_STATUS.IDLE,
-  error: null,
   appointments: [],
   filteredAppointments: null,
   filterCriteria: {
@@ -33,7 +30,7 @@ export const fetchAppointments = createAsyncThunk(
 );
 
 export const fetchAppointment = createAsyncThunk(
-  'appointments/fetchAppointment',
+  'appointment/fetchAppointment',
   async (id) => {
     const appointments = await api.get(`/appointments/${id}`);
     return appointments;
@@ -63,15 +60,19 @@ export const createAppointment = createAsyncThunk(
 
 export const updateAppointment = createAsyncThunk(
   'appointments/updateAppointment',
-  async (id, data) => {
-    const result = await api.patch(`/appointments/${id}`, data);
+  async (data) => {
+    const { id, changedData } = data;
+    const result = await api.patch(`/appointments/${id}`, changedData);
     return result;
   }
 );
 
 export const deleteAppointment = createAsyncThunk(
   'appointments/deleteAppointment',
-  async (appointmentId, appointment) => {}
+  async (id) => {
+    const appointmentDeleted = await api.delete(`/appointments/${id}`);
+    return appointmentDeleted;
+  }
 );
 
 export const fetchDepartments = createAsyncThunk(
@@ -111,16 +112,8 @@ const appointmentsSlice = createSlice({
   },
   extraReducers(builder) {
     builder
-      .addCase(fetchAppointments.pending, (state) => {
-        state.status = FETCH_STATUS.LOADING;
-      })
       .addCase(fetchAppointments.fulfilled, (state, action) => {
-        state.status = FETCH_STATUS.SUCCEEDED;
         state.appointments = action.payload;
-      })
-      .addCase(fetchAppointments.rejected, (state, action) => {
-        state.status = FETCH_STATUS.FAILED;
-        state.error = action.error.message;
       })
 
       .addCase(createAppointment.fulfilled, (state, action) => {
