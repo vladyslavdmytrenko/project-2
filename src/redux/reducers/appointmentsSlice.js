@@ -53,7 +53,7 @@ export const createAppointment = createAsyncThunk(
       notes: appointments.notes,
     };
 
-    const result = api.post('/appointments', transformData);
+    const result = await api.post('/appointments', transformData);
     return result;
   }
 );
@@ -78,7 +78,7 @@ export const deleteAppointment = createAsyncThunk(
 export const fetchDepartments = createAsyncThunk(
   'appointments/fetchDepartments',
   async () => {
-    const departments = api.get('/departments');
+    const departments = await api.get('/departments');
     return departments;
   }
 );
