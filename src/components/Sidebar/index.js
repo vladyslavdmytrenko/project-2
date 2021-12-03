@@ -12,14 +12,12 @@ const Sidebar = () => {
   const { isAuth, status } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
 
-  const onClickMenuItem = ({ key }) => {
-    if (key === 'login') {
-      dispatch(login());
-    }
+  const handlerLogout = () => {
+    dispatch(logout());
+  };
 
-    if (key === 'logout') {
-      dispatch(logout());
-    }
+  const handlerLogin = () => {
+    dispatch(login());
   };
 
   const renderMenu = () => {
@@ -33,14 +31,14 @@ const Sidebar = () => {
 
     if (!isAuth) {
       return (
-        <Menu.Item icon={<LoginOutlined />} key="login">
+        <Menu.Item icon={<LoginOutlined />} key="login" onClick={handlerLogin}>
           Login
         </Menu.Item>
       );
     }
 
     return (
-      <Menu.Item icon={<LogoutOutlined />} key="logout">
+      <Menu.Item icon={<LogoutOutlined />} key="logout" onClick={handlerLogout}>
         logout
       </Menu.Item>
     );
@@ -49,7 +47,7 @@ const Sidebar = () => {
   return (
     <>
       <Layout.Sider className={style.sidebar} collapsible={true}>
-        <Menu theme="dark" className={style.menu} onClick={onClickMenuItem}>
+        <Menu theme="dark" className={style.menu}>
           {renderMenu()}
         </Menu>
       </Layout.Sider>
