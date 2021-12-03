@@ -57,4 +57,7 @@ const auth = createSlice({
   },
 });
 
+export const isAuthSelector = (state) => state.auth.isAuth;
+export const authStatusSelector = (state) => state.auth.status;
+
 export default auth.reducer;

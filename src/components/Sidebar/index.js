@@ -3,13 +3,19 @@ import { Layout, Menu, Spin } from 'antd';
 import { LoginOutlined, LogoutOutlined } from '@ant-design/icons';
 import { useSelector, useDispatch } from 'react-redux';
 
-import { login, logout } from 'redux/reducers/authSlice';
+import {
+  authStatusSelector,
+  isAuthSelector,
+  login,
+  logout,
+} from 'redux/reducers/authSlice';
 import { FETCH_STATUS } from 'constant';
 
 import style from './Sidebar.module.css';
 
 const Sidebar = () => {
-  const { isAuth, status } = useSelector((state) => state.auth);
+  const isAuth = useSelector(isAuthSelector);
+  const status = useSelector(authStatusSelector);
   const dispatch = useDispatch();
 
   const handlerLogout = () => {
