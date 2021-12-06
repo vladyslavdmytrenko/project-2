@@ -49,7 +49,8 @@ const AppointmentTable = () => {
     if (status === FETCH_STATUS.IDLE) {
       getAppointments();
     }
-  });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [status]);
 
   const getAppointments = async () => {
     setStatus(FETCH_STATUS.LOADING);

@@ -32,7 +32,8 @@ const AppointmentsFilter = () => {
     if (departmentStatus === FETCH_STATUS.IDLE) {
       fetchDepartment();
     }
-  });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [departmentStatus]);
 
   const onDepartmentChange = (value) => {
     if (departmentStatus !== FETCH_STATUS.LOADING) {

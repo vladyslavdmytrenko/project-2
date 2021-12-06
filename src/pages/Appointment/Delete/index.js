@@ -23,7 +23,8 @@ const DeletePage = () => {
     if (appointmentStatus === FETCH_STATUS.IDLE) {
       getAppointment(id);
     }
-  });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [appointmentStatus]);
 
   const getAppointment = async (id) => {
     setAppointmentStatus(FETCH_STATUS.LOADING);

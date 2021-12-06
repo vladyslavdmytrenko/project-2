@@ -84,10 +84,11 @@ const AppointmentForm = (props) => {
       }
     };
 
-    if (departmentStatus !== FETCH_STATUS.LOADING && !departments.length) {
+    if (departmentStatus !== FETCH_STATUS.IDLE) {
       getDepartments();
     }
-  });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [departmentStatus]);
 
   const handleCancel = () => {
     resetForm();
