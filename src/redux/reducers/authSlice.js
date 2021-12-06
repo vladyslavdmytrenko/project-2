@@ -5,7 +5,7 @@ import { googleLogin, googleLogout } from 'api/googleAuth';
 
 const initialState = {
   status: FETCH_STATUS.IDLE,
-  isAuth: localStorage.getItem('userId') ? true : false,
+  isAuth: !!localStorage.getItem('userId'),
   userId: localStorage.getItem('userId'),
   error: null,
 };
